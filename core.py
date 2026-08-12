@@ -520,6 +520,10 @@ CORS = {
 }
 
 
+# 部署自标识：每次修改后端后递增，便于线上核实生效版本
+APP_VERSION = "v2026.08.13.2"
+
+
 def app_dispatch(method, path, query, headers, raw_body):
     method = (method or "GET").upper()
     path = (path or "").split("?")[0]
@@ -539,6 +543,7 @@ def app_dispatch(method, path, query, headers, raw_body):
             return jresp(200, build_products())
         if path == "/api/health":
             return jresp(200, {"ok": True,
+                               "version": APP_VERSION,
                                "latest": (latest_top10_path() or "").replace(WS, ""),
                                "orders": len(st["orders"]),
                                "listings": len(st["listings"]),

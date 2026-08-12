@@ -1,6 +1,10 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/[...path].py" },
-    { "source": "/((?!api/).*)", "destination": "/app/$1" }
-  ]
+    { "source": "/(.*)", "destination": "/api/[...path].py" }
+  ],
+  "functions": {
+    "api/[...path].py": {
+      "includeFiles": ["app/**", "core.py", "store.py"]
+    }
+  }
 }
