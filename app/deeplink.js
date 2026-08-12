@@ -2,10 +2,16 @@
 // API: 可配置后端地址（同源 / 自托管公网实时后端）
 // DEEPLINK: 调用手机内已登录的闲鱼 / 1688 App，绕开网页登录态
 
+// ★ 默认后端地址（部署后把 Render 地址写死在这里，用户无需手动填）
+//   留空 '' = 同源（即托管后端，server.py 同源服务前端+API）。
+//   例如填： 'https://lingyu-backend.onrender.com'
+//   优先级：用户「后端设置」手动填 > 此处 DEFAULT_BACKEND > 同源
+const DEFAULT_BACKEND = '';
+
 window.API = {
-  // 后端基地址：localStorage 中可配置公网后端；为空=同源（本机 server.py 或部署后端）
+  // 后端基地址：localStorage 中可配置公网后端；否则用写死的默认后端；再否则同源
   base() {
-    return (localStorage.getItem('lingyu_api_base') || '').replace(/\/+$/, '');
+    return (localStorage.getItem('lingyu_api_base') || DEFAULT_BACKEND || '').replace(/\/+$/, '');
   },
   url(path) {
     const b = this.base();
