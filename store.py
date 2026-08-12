@@ -14,6 +14,9 @@ UPSTASH_TOKEN = os.environ.get("UPSTASH_REST_TOKEN", "").strip()
 LOCAL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "app_state.json")
 REDIS_KEY = "lingyu_state"
 
+# 只读文件系统（如 Vercel 未配 Upstash）时的内存兜底：本次调用/热实例内可读写，不跨实例持久。
+_MEMORY_STATE = None
+
 
 def _upstash_get():
     req = urllib.request.Request(
@@ -49,6 +52,11 @@ def load_state_raw(default):
                 return st
         except Exception:
             pass
+    if _MEMORY_STATE is not None:
+        st = _MEMORY_STATE
+        for k, v in default.items():
+            st.setdefault(k, v)
+        return st
     if os.path.exists(LOCAL_PATH):
         try:
             with open(LOCAL_PATH, encoding="utf-8") as f:
@@ -62,13 +70,20 @@ def load_state_raw(default):
 
 
 def save_state_raw(st):
+    global _MEMORY_STATE
     if UPSTASH_URL and UPSTASH_TOKEN:
         try:
             _upstash_set(st)
             return
         except Exception:
             pass
-    tmp = LOCAL_PATH + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(st, f, ensure_ascii=False)
-    os.replace(tmp, LOCAL_PATH)
+    # 回退：本地文件（本地开发，可写）或内存（Vercel 只读 FS，避免 500）
+    try:
+        tmp = LOCAL_PATH + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(st, f, ensure_ascii=False)
+        os.replace(tmp, LOCAL_PATH)
+        _MEMORY_STATE = None
+        return
+    except Exception:
+        _MEMORY_STATE = st
