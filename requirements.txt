@@ -1,2 +1,4 @@
-# 灵鱼铺货后端仅依赖 Python 标准库，无需第三方包。
-# 此文件保留以便 Render / PythonAnywhere 等平台识别为 Python 项目。
+# 灵鱼铺货后端核心仅依赖 Python 标准库（core.py / store.py 用 urllib 等，无需第三方包）。
+# Vercel Python 函数(api/[...path].py)通过 werkzeug 的 WSGI 入口调用 core.app_dispatch，
+# 显式声明 werkzeug 以便 Vercel 安装（部分 Python 运行时默认不自带 werkzeug）。
+werkzeug>=2.0
