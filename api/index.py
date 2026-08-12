@@ -6,8 +6,11 @@ Vercel Serverless 函数入口（Python，纯标准库，无任何第三方依�
   - /api/*  -> core.app_dispatch（业务 API，返回 JSON）
   - 其余路径 -> 从 app/ 目录托管前端静态文件（SPA 入口 + 资源）
 
-使用纯标准库实现 WSGI 入口，避免对 werkzeug 等第三方包的依赖，
-彻底规避 Vercel 构建/部署阶段依赖未安装导致的 FUNCTION_INVOCATION_FAILED。
+说明：
+  - 纯标准库实现 WSGI 入口，不依赖 werkzeug 等任何第三方包。
+    彻底规避 Vercel 构建/部署阶段依赖未安装导致的 FUNCTION_INVOCATION_FAILED。
+  - 为便于线上排错，core 的导入放在 app() 内部并整体 try/except，
+    任何导入/运行异常都会以 JSON 形式返回，便于直接看到真实栈。
 """
 import sys
 import os
@@ -15,12 +18,14 @@ import json
 import mimetypes
 from urllib.parse import parse_qs
 
-# 把项目根加入 sys.path，确保能 import 同目录的 core / store
+# 把项目根加入 sys.path（core/store 在 api/ 同级，确保可被导入）
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.append(ROOT)
-
-from core import app_dispatch, CORS, APP_VERSION
+# 同时把函数所在目录（api/）加入，确保同目录的 core/store 可被导入
+API_DIR = os.path.dirname(os.path.abspath(__file__))
+if API_DIR not in sys.path:
+    sys.path.append(API_DIR)
 
 STATIC_DIR = os.path.join(ROOT, "app")
 TEXT_TYPES = {"text/html", "text/css", "application/javascript", "application/json",
@@ -50,7 +55,7 @@ def serve_static(path):
     full = os.path.normpath(os.path.join(STATIC_DIR, rel))
     # 防目录穿越
     if not (full == STATIC_DIR or full.startswith(STATIC_DIR + os.sep)):
-        return (403, b"forbidden", dict(CORS))
+        return (403, b"forbidden", {"Access-Control-Allow-Origin": "*"})
     if os.path.isdir(full):
         full = os.path.join(full, "index.html")
     if not os.path.isfile(full):
@@ -60,7 +65,7 @@ def serve_static(path):
         with open(full, "rb") as f:
             data = f.read()
     except Exception:
-        return (404, b"not found", dict(CORS))
+        return (404, b"not found", {"Access-Control-Allow-Origin": "*"})
     return (200, data, {"Content-Type": _content_type(full),
                         "Cache-Control": "public, max-age=300"})
 
@@ -74,60 +79,78 @@ def _start(status, extra_headers, start_response):
 
 
 def app(environ, start_response):
-    method = (environ.get("REQUEST_METHOD") or "GET").upper()
-    raw_path = environ.get("PATH_INFO") or "/"
-    query_string = environ.get("QUERY_STRING") or ""
-    query = parse_qs(query_string)
-
-    # 请求头
-    headers_in = {}
-    for k, v in environ.items():
-        if k.startswith("HTTP_"):
-            name = k[5:].replace("_", "-").title()
-            headers_in[name] = v
-
-    # 请求体
     try:
-        cl = int(environ.get("CONTENT_LENGTH") or 0)
-    except (ValueError, TypeError):
-        cl = 0
-    body = b""
-    if cl > 0:
-        body = environ["wsgi.input"].read(cl)
+        # 延迟导入：让导入失败也能以 JSON 形式暴露真实错误
+        from core import app_dispatch, CORS, APP_VERSION
 
-    # OPTIONS 预检
-    if method == "OPTIONS":
-        status, payload, extra = app_dispatch(method, raw_path, query, headers_in, body)
-        _start(status, extra, start_response)
-        return [b""]
+        method = (environ.get("REQUEST_METHOD") or "GET").upper()
+        raw_path = environ.get("PATH_INFO") or "/"
+        query_string = environ.get("QUERY_STRING") or ""
+        query = parse_qs(query_string)
 
-    # 业务 API
-    if raw_path.startswith("/api/") or raw_path == "/api":
-        status, payload, extra = app_dispatch(method, raw_path, query, headers_in, body)
-        resp_body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-        base = {"Content-Type": "application/json; charset=utf-8",
-                "Cache-Control": "no-store"}
-        base.update(extra or {})
-        _start(status, base, start_response)
-        return [resp_body]
+        # 请求头
+        headers_in = {}
+        for k, v in environ.items():
+            if k.startswith("HTTP_"):
+                name = k[5:].replace("_", "-").title()
+                headers_in[name] = v
 
-    # 非 API：托管前端静态资源（仅 GET）
-    if method == "GET":
-        status, body_bytes, shdrs = serve_static(raw_path)
-        _start(status, shdrs, start_response)
-        return [body_bytes]
+        # 请求体
+        try:
+            cl = int(environ.get("CONTENT_LENGTH") or 0)
+        except (ValueError, TypeError):
+            cl = 0
+        body = b""
+        if cl > 0:
+            body = environ["wsgi.input"].read(cl)
 
-    # 其他非 API 方法
-    resp = json.dumps({"ok": False, "error": "method not allowed"}, ensure_ascii=False).encode("utf-8")
-    hdrs = dict(CORS)
-    hdrs["Content-Type"] = "application/json; charset=utf-8"
-    _start(405, hdrs, start_response)
-    return [resp]
+        # OPTIONS 预检
+        if method == "OPTIONS":
+            status, payload, extra = app_dispatch(method, raw_path, query, headers_in, body)
+            _start(status, extra, start_response)
+            return [b""]
+
+        # 业务 API
+        if raw_path.startswith("/api/") or raw_path == "/api":
+            status, payload, extra = app_dispatch(method, raw_path, query, headers_in, body)
+            resp_body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+            base = {"Content-Type": "application/json; charset=utf-8",
+                    "Cache-Control": "no-store"}
+            base.update(extra or {})
+            _start(status, base, start_response)
+            return [resp_body]
+
+        # 非 API：托管前端静态资源（仅 GET）
+        if method == "GET":
+            status, body_bytes, shdrs = serve_static(raw_path)
+            _start(status, shdrs, start_response)
+            return [body_bytes]
+
+        # 其他非 API 方法
+        resp = json.dumps({"ok": False, "error": "method not allowed"}, ensure_ascii=False).encode("utf-8")
+        hdrs = dict(CORS)
+        hdrs["Content-Type"] = "application/json; charset=utf-8"
+        _start(405, hdrs, start_response)
+        return [resp]
+
+    except Exception as exc:
+        import traceback
+        tb = traceback.format_exc()
+        err_body = json.dumps(
+            {"ok": False, "error": "handler_exception", "detail": tb},
+            ensure_ascii=False
+        ).encode("utf-8")
+        try:
+            start_response("500 Internal Server Error",
+                           [("Content-Type", "application/json; charset=utf-8")])
+        except Exception:
+            pass
+        return [err_body]
 
 
 # 本地调试：直接 `python api/index.py`
 if __name__ == "__main__":
     from wsgiref.simple_server import make_server  # 仅本地调试用，标准库
     port = int(os.environ.get("PORT", "8090"))
-    print("Serving on http://127.0.0.1:%d  (version %s)" % (port, APP_VERSION))
+    print("Serving on http://127.0.0.1:%d" % port)
     make_server("127.0.0.1", port, app).serve_forever()
