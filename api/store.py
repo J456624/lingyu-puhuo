@@ -14,6 +14,9 @@ UPSTASH_TOKEN = os.environ.get("UPSTASH_REST_TOKEN", "").strip()
 LOCAL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "app_state.json")
 REDIS_KEY = "lingyu_state"
 
+# 当前持久化模式：两个 Upstash 变量都非空 → upstash；否则 → 内存兜底（不跨实例持久）
+STORAGE_MODE = "upstash" if (UPSTASH_URL and UPSTASH_TOKEN) else "memory"
+
 # 只读文件系统（如 Vercel 未配 Upstash）时的内存兜底：本次调用/热实例内可读写，不跨实例持久。
 _MEMORY_STATE = None
 

@@ -39,7 +39,7 @@ DEFAULT_SEED = 'LINGYU@MAKE#2026*SEED'
 MAKER_ACCOUNTS = set(a.strip() for a in os.environ.get('MAKER_ACCOUNTS', 'maker').split(',') if a.strip())
 KEY_SEED = os.environ.get('KEY_SEED') or DEFAULT_SEED
 
-from store import load_state_raw, save_state_raw
+from store import load_state_raw, save_state_raw, STORAGE_MODE
 
 STATE = None  # 每次请求由 app_dispatch 载入
 
@@ -544,6 +544,7 @@ def app_dispatch(method, path, query, headers, raw_body):
         if path == "/api/health":
             return jresp(200, {"ok": True,
                                "version": APP_VERSION,
+                               "storage": STORAGE_MODE,
                                "latest": (latest_top10_path() or "").replace(WS, ""),
                                "orders": len(st["orders"]),
                                "listings": len(st["listings"]),
