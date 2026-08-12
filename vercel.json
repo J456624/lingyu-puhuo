@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/[...path].py" },
+    { "source": "/((?!api/).*)", "destination": "/app/$1" }
+  ]
+}

@@ -95,22 +95,15 @@ function timeAgo(ts) {
   return Math.floor(s / 86400) + ' 天前';
 }
 
-// 实时消息：SSE 推送
-let ES = null;
+// 实时消息：前端轮询（Vercel Serverless 友好，5 秒一次，体验同 SSE）
+let POLL_TIMER = null;
 function connectStream() {
-  try {
-    ES = new EventSource(API.stream());
-    ES.onmessage = (ev) => {
-      try {
-        const d = JSON.parse(ev.data);
-        if (d.type === 'message' && d.payload) {
-          APP.messages.push(d.payload);
-          if (state.route === 'messages') render();
-        }
-      } catch (e) {}
-    };
-    ES.onerror = () => {};   // 断线自动重连
-  } catch (e) {}
+  if (POLL_TIMER) return;                 // 避免重复轮询
+  const tick = async () => {
+    try { await loadState(); } catch (e) {}
+  };
+  tick();
+  POLL_TIMER = setInterval(tick, 5000);   // 每 5 秒拉一次 /api/state
 }
 
 // ===== 业务动作 =====
@@ -260,7 +253,7 @@ function toast(msg) {
   t.textContent = msg; t.classList.add('on');
   clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove('on'), 1600);
 }
-function reconnectStream() { if (ES) { try { ES.close(); } catch (e) {} ES = null; } connectStream(); }
+function reconnectStream() { if (POLL_TIMER) return; connectStream(); }
 
 // ===== 主渲染 =====
 function render() {
