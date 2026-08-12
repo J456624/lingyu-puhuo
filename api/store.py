@@ -2,7 +2,7 @@
 """
 状态持久化层（Vercel 友好）：
 - 若配置了 UPSTASH_REST_URL / UPSTASH_REST_TOKEN（Upstash Redis REST，免费），走 Redis；
-- 否则回退本地 app_state.json（本地 server.py 使用）。
+- 否则回退本地 app_state.json（本地 server_local.py 使用）。
 Upstash REST 仅用标准库 urllib，无需任何第三方依赖。
 """
 import os

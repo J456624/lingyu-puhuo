@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 灵鱼·商品铺货助手 —— 共享后端内核
-本地 server.py 与 Vercel 函数 api/[...path].py 共用本模块。
+本地 server_local.py 与 Vercel 函数 api/[...path].py 共用本模块。
 对外唯一入口：app_dispatch(method, path, query, headers, raw_body) -> (status, payload, extra_headers)
 状态持久化走 store（Upstash Redis / 本地文件）。SSE 已改为前端轮询，故本模块不再推送。
 """
@@ -20,7 +20,7 @@ from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 
 # ---------- 路径 / 运行参数 ----------
-_CORE_DIR = os.path.dirname(os.path.abspath(__file__))     # 项目根(server.py/core.py 所在目录)
+_CORE_DIR = os.path.dirname(os.path.abspath(__file__))     # 项目根(server_local.py/core.py 所在目录)
 WS = _CORE_DIR
 APP_DIR = os.path.join(_CORE_DIR, "app")
 JSON_GLOB = os.path.join(WS, "二次元闲鱼选品_Top10_*.json")

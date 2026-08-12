@@ -2,7 +2,7 @@
 
 架构已重构为 **Serverless 友好**：
 - `core.py`：共享后端内核（所有路由 / 密钥算法 / 状态），本地与 Vercel 共用；
-- `server.py`：本地常驻进程（开发 / 内网），同源托管 `app/` 与 `/images/`；
+- `server_local.py`：本地常驻进程（开发 / 内网），同源托管 `app/` 与 `/images/`；
 - `api/[...path].py`：Vercel Python 函数，转发到 `core.app_dispatch`；
 - `vercel.json`：前端静态资源同源托管于 `/app/`，`/api/*` 走函数；
 - `store.py`：状态持久化走 **Upstash Redis**（零依赖 REST），未配置则回退本地 `app_state.json`；
@@ -88,8 +88,8 @@ GET https://<你的Vercel地址>/api/select/refresh
 ## 五、本地运行（开发 / 预览）
 
 ```bash
-python server.py            # 默认端口 8080
-PORT=8090 python server.py  # 指定端口
+python server_local.py            # 默认端口 8080
+PORT=8090 python server_local.py  # 指定端口
 ```
 浏览器打开 `http://127.0.0.1:8090/` 即为完整可安装 PWA；手机同局域网访问该地址体验唤起原生 App。
 本地状态存于 `app_state.json`，与 Upstash 互不干扰。
@@ -98,5 +98,5 @@ PORT=8090 python server.py  # 指定端口
 
 ## 附：仍想用 Render / Railway（可选）
 - `render.yaml` / `Procfile` 仍在，可用 Render Blueprint 部署（长驻进程，SSE 可用）。
-- Railway：`railway up` 自动识别 `Procfile`（`web: python server.py`）。
+- Railway：`railway up` 自动识别 `Procfile`（`web: python server_local.py`）。
 - 这两种方案用常驻进程，状态存 `app_state.json`（挂载持久卷即可），无需 Upstash。
