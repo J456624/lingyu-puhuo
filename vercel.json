@@ -1,9 +1,9 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/[...path].py" }
+    { "source": "/(.*)", "destination": "/api/index.py" }
   ],
   "functions": {
-    "api/[...path].py": {
+    "api/index.py": {
       "includeFiles": "app/**"
     }
   }
