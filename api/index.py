@@ -56,7 +56,7 @@ def serve_static(path):
 
 
 @Request.application
-def handler(request):
+def app(request):
     method = (request.method or "GET").upper()
     path = request.path or "/"
     query = request.args.to_dict() if hasattr(request.args, "to_dict") else dict(request.args)
@@ -85,4 +85,4 @@ def handler(request):
 # 便于本地调试：直接 `python api/\[...path\].py` 时跑一个临时服务
 if __name__ == "__main__":
     from werkzeug.serving import run_simple
-    run_simple("127.0.0.1", 8090, handler)
+    run_simple("127.0.0.1", 8090, app)
