@@ -1,0 +1,8 @@
+# 运行时私有/大文件，不纳入部署仓库
+.workbuddy/
+__pycache__/
+*.pyc
+*.tmp
+images/
+app_state.json
+*.log

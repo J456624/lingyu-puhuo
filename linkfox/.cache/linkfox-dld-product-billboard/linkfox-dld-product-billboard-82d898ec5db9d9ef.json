@@ -1,0 +1,171 @@
+{
+  "errcode": 200,
+  "total": 0,
+  "columns": [
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "dataType",
+      "sortable": true,
+      "title": "数据类型: weeklyData: 周数据; monthlyData: 月数据"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "offerId",
+      "sortable": true,
+      "title": "商品id"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "asin",
+      "sortable": true,
+      "title": "商品编号"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "shopId",
+      "sortable": true,
+      "title": "店铺id"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "imageUrl",
+      "sortable": true,
+      "title": "图片地址"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "availableDate",
+      "sortable": true,
+      "title": "商品上架时间，格式为 yyyy-MM-dd HH:mm:ss"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "quantityPrices",
+      "sortable": true,
+      "title": "价格区间"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "title",
+      "sortable": true,
+      "title": "商品标题"
+    },
+    {
+      "filterable": true,
+      "cellType": "number",
+      "field": "price",
+      "sortable": true,
+      "title": "批发价"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "deliveryTime",
+      "sortable": true,
+      "title": "发货时间"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "company",
+      "sortable": true,
+      "title": "店铺名称"
+    },
+    {
+      "filterable": true,
+      "cellType": "number",
+      "field": "salesQuantity",
+      "sortable": true,
+      "title": "销售件数（按统计周期返回对应的值）"
+    },
+    {
+      "filterable": true,
+      "cellType": "number",
+      "field": "salesOrderCount",
+      "sortable": true,
+      "title": "销售笔数（按统计周期返回对应的值）"
+    },
+    {
+      "filterable": true,
+      "cellType": "number",
+      "field": "estimatedSalesAmount",
+      "sortable": true,
+      "title": "预估销售额（按统计周期返回对应的值）"
+    },
+    {
+      "filterable": true,
+      "cellType": "number",
+      "field": "consignPrice",
+      "sortable": true,
+      "title": "代发价"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "unit",
+      "sortable": true,
+      "title": "单位"
+    },
+    {
+      "filterable": true,
+      "cellType": "number",
+      "field": "quantityBegin",
+      "sortable": true,
+      "title": "起批量"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "levelName",
+      "sortable": true,
+      "title": "类目层级名称"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "shopUrl",
+      "sortable": true,
+      "title": "店铺链接地址"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "asinUrl",
+      "sortable": true,
+      "title": "商品链接地址"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "sourceType",
+      "sortable": true,
+      "title": "1688"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "currency",
+      "sortable": true,
+      "title": "币种"
+    },
+    {
+      "filterable": true,
+      "cellType": "text",
+      "field": "sourceTool",
+      "sortable": true,
+      "title": "来源工具"
+    }
+  ],
+  "costToken": 12000,
+  "errmsg": "ok",
+  "type": "productWorkbenches",
+  "products": []
+}

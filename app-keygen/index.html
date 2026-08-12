@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#7a3ad1">
+<title>灵钥·密钥生成器</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="status"><span>灵钥</span><span class="r"><span>🔐</span><span id="fp">FP:----</span></span></div>
+  <div id="view"></div>
+  <nav class="tab" id="tab">
+    <a class="t on" data-route="gen"><span class="ic">🔑</span><span>生成密钥</span></a>
+    <a class="t" data-route="history"><span class="ic">📜</span><span>签发记录</span></a>
+    <a class="t" data-route="keymgr"><span class="ic">🗂️</span><span>密钥管理</span></a>
+    <a class="t" data-route="maker"><span class="ic">⚙️</span><span>制造者</span></a>
+  </nav>
+</div>
+<div class="mask" id="mask"><div class="sheet" id="sheet"></div></div>
+<script src="keylib.js"></script>
+<script src="deeplink.js"></script>
+<script src="app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}t.textContent=msg;t.classList.add('on');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('on'),1600);}
+const $= (s,p=document)=>p.querySelector(s);
+const $$ = (s,p=document)=>[...p.querySelectorAll(s)];
+</script>
+</body>
+</html>

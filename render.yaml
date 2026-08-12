@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: lingyu-backend
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: LINKFOX_AGENT_API_KEY
+        sync: false
+      - key: KEY_SEED
+        sync: false
+      - key: MAKER_ACCOUNTS
+        value: "maker"

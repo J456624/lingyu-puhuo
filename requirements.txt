@@ -1,0 +1,2 @@
+# 灵鱼铺货后端仅依赖 Python 标准库，无需第三方包。
+# 此文件保留以便 Render / PythonAnywhere 等平台识别为 Python 项目。

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ff5000">
+<title>灵鱼·商品铺货助手</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+<div class="shell" id="shell">
+  <div class="status"><span>16:20</span><span class="r"><span>5G</span><span>📶</span><span>🔋59</span></span></div>
+
+  <div id="view"></div>
+
+  <!-- 在线/离线状态条 + 刷新 -->
+  <div class="netbar" id="netbar"><span id="netdot" class="dot"></span><span id="nettxt">联网中</span>
+    <button class="rf" onclick="refreshData()" title="刷新商品">⟳</button></div>
+
+  <!-- Bottom Tab -->
+  <nav class="tab" id="tab">
+    <a class="t on" data-route="home"><span class="ic">🏠</span><span>工作台</span></a>
+    <a class="t" data-route="products"><span class="ic">📦</span><span>选品</span></a>
+    <a class="t center" data-route="publish"><span class="ic">＋</span><span style="opacity:0;font-size:0">铺</span></a>
+    <a class="t" data-route="orders"><span class="ic">📋</span><span>订单</span></a>
+    <a class="t" data-route="me"><span class="ic">👤</span><span>我的</span></a>
+  </nav>
+</div>
+
+<!-- 全局弹层 -->
+<div class="mask" id="mask"><div class="sheet" id="sheet"></div></div>
+
+<!-- 登录门禁（密钥登录）-->
+<div class="login" id="login">
+  <div class="lg-card">
+    <div class="lg-logo">🐟</div>
+    <h1>灵鱼·商品铺货助手</h1>
+    <p class="lg-sub">密钥登录 · 账号 + 制造者签发的 32 位密钥</p>
+    <div class="field"><label>账号</label>
+      <input id="lg-acc" placeholder="输入你的账号（与密钥绑定的一致）" autocomplete="off"></div>
+    <div class="field"><label>密钥</label>
+      <input id="lg-key" placeholder="32 位数字 + 特殊字符" autocomplete="off" style="font-family:monospace;letter-spacing:1px"></div>
+    <button class="btn p block" onclick="doLogin()">登 录</button>
+    <p class="lg-tip">🔑 密钥由软件制造者通过「灵钥」密钥生成器签发，<br>无密钥无法使用本软件。账号与密钥须匹配。</p>
+    <div class="lg-maker" onclick="openMakerBind()">制造者设置 ›</div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="products.js"></script>
+<script src="deeplink.js"></script>
+<script src="keylib.js"></script>
+<script src="app.js"></script>
+<script>
+// ===== 注册 Service Worker（安装到手机/离线可用）=====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+// ===== 在线/离线指示 =====
+function updateNet() {
+  const on = navigator.onLine;
+  document.getElementById('netdot').className = 'dot ' + (on ? 'on' : 'off');
+  document.getElementById('nettxt').textContent = on ? '联网中' : '离线(已缓存)';
+}
+window.addEventListener('online', updateNet);
+window.addEventListener('offline', updateNet);
+updateNet();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "灵钥·密钥生成器",
+  "short_name": "灵钥",
+  "description": "软件制造者专属的密钥生成器，为灵鱼·商品铺货助手签发 32 位密钥",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#7a3ad1",
+  "theme_color": "#7a3ad1",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

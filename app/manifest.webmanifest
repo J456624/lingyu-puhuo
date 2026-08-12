@@ -1,0 +1,17 @@
+{
+  "name": "灵鱼·商品铺货助手",
+  "short_name": "灵鱼铺货",
+  "description": "1688 商品一键铺货到闲鱼等平台的全流程助手：选品/文案/上架/代发/分销",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f5f7",
+  "theme_color": "#ff5000",
+  "lang": "zh-CN",
+  "categories": ["shopping", "business", "productivity"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
